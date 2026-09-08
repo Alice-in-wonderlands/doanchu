@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1b1410">
+<title>Đoán Chữ Vô Hạn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lacquer:#1b1410;
+    --lacquer-2:#241a14;
+    --panel:#2a1f18;
+    --cream:#f3ead6;
+    --cream-dim:#cdbfa4;
+    --vermillion:#c8433a;
+    --vermillion-deep:#9c3229;
+    --gold:#c9a24b;
+    --leaf:#4f7a5c;
+    --sky:#3f7f9e;
+    --green:#4f7a5c;
+    --yellow:#c9a24b;
+    --blue:#3f7f9e;
+    --gray:#4a3d33;
+    --gray-dim:#372c24;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, rgba(200,67,58,0.10), transparent 45%),
+      radial-gradient(circle at 100% 20%, rgba(201,162,75,0.08), transparent 40%),
+      var(--lacquer);
+    color:var(--cream);
+    font-family:'Be Vietnam Pro', sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 16px 40px;
+  }
+  .wrap{ width:100%; max-width:560px; }
+
+  header{ margin-bottom:18px; }
+  .eyebrow-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:2.3rem;
+    line-height:1;
+    margin:0;
+    letter-spacing:0.2px;
+    color:var(--cream);
+  }
+  h1 em{
+    font-style:italic;
+    color:var(--vermillion);
+  }
+  .tagline{
+    margin:8px 0 0;
+    color:var(--cream-dim);
+    font-size:0.95rem;
+    max-width:46ch;
+  }
+  .icon-btn{
+    background:none;
+    border:1px solid rgba(243,234,214,0.25);
+    color:var(--cream);
+    border-radius:999px;
+    width:38px;height:38px;
+    font-size:1.05rem;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    flex:none;
+    transition:border-color .15s, background .15s;
+  }
+  .icon-btn:hover{ border-color:var(--gold); background:rgba(201,162,75,0.08); }
+
+  .stats-strip{
+    display:flex;
+    gap:18px;
+    margin:16px 0 20px;
+    padding:12px 16px;
+    background:var(--panel);
+    border:1px solid rgba(243,234,214,0.08);
+    border-radius:10px;
+  }
+  .stat{ flex:1; text-align:center; }
+  .stat .n{ font-family:'Fraunces', serif; font-size:1.4rem; color:var(--gold); display:block; }
+  .stat .l{ font-size:0.72rem; color:var(--cream-dim); text-transform:uppercase; letter-spacing:0.06em; }
+
+  .legend{
+    display:flex; flex-wrap:wrap; gap:10px 18px;
+    font-size:0.8rem; color:var(--cream-dim);
+    margin-bottom:20px;
+    padding-bottom:16px;
+    border-bottom:1px solid rgba(243,234,214,0.1);
+  }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .swatch{ width:14px; height:14px; border-radius:3px; display:inline-block; }
+
+  #board-area{ display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:22px; }
+  .row{ display:flex; gap:6px; }
+  .gap-space{ width:16px; }
+  .cell{
+    width:44px; height:44px;
+    border:2px solid rgba(243,234,214,0.18);
+    border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem; font-weight:700;
+    text-transform:uppercase;
+    background:transparent;
+    color:var(--cream);
+    transition:transform .12s ease, background .25s, border-color .25s;
+  }
+  .cell.filled{ border-color:rgba(243,234,214,0.4); }
+  .cell.pop{ transform:scale(1.08); }
+  .cell.green{ background:var(--green); border-color:var(--green); color:#fff; }
+  .cell.yellow{ background:var(--yellow); border-color:var(--yellow); color:#241a14; }
+  .cell.blue{ background:var(--blue); border-color:var(--blue); color:#fff; }
+  .cell.gray{ background:var(--gray-dim); border-color:var(--gray-dim); color:var(--cream-dim); }
+  .cell.flip{ animation:flip .5s ease forwards; }
+  @keyframes flip{
+    0%{ transform:rotateX(0); }
+    50%{ transform:rotateX(90deg); }
+    100%{ transform:rotateX(0); }
+  }
+  @media (max-width:400px){
+    .cell{ width:34px; height:34px; font-size:1.05rem; }
+    .gap-space{ width:10px; }
+  }
+
+  #msg{
+    min-height:24px;
+    text-align:center;
+    font-size:0.88rem;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+
+  #result-panel{
+    display:none;
+    text-align:center;
+    background:var(--panel);
+    border:1px solid rgba(201,162,75,0.35);
+    border-radius:10px;
+    padding:16px;
+    margin-bottom:18px;
+  }
+  #result-panel.show{ display:block; }
+  #result-title{ font-family:'Fraunces', serif; font-size:1.3rem; margin:0 0 4px; color:var(--gold); }
+  #result-phrase{ font-size:1.05rem; margin:0 0 12px; color:var(--cream); }
+  #result-phrase b{ color:var(--vermillion); }
+  .result-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+  button.primary{
+    background:var(--vermillion);
+    color:#fff;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    font-weight:600;
+    font-size:0.9rem;
+    cursor:pointer;
+    font-family:'Be Vietnam Pro', sans-serif;
+    transition:background .15s, transform .1s;
+  }
+  button.primary:hover{ background:var(--vermillion-deep); }
+  button.primary:active{ transform:scale(0.97); }
+  button.ghost{
+    background:transparent;
+    color:var(--cream);
+    border:1px solid rgba(243,234,214,0.3);
+    padding:10px 18px;
+    border-radius:8px;
+    font-weight:600;
+    font-size:0.9rem;
+    cursor:pointer;
+    font-family:'Be Vietnam Pro', sans-serif;
+  }
+  button.ghost:hover{ border-color:var(--gold); color:var(--gold); }
+
+  #keyboard{ display:flex; flex-direction:column; gap:6px; align-items:center; }
+  .krow{ display:flex; gap:5px; justify-content:center; flex-wrap:wrap; }
+  .key{
+    min-width:30px; height:42px;
+    border-radius:6px;
+    border:none;
+    background:#3a2c22;
+    color:var(--cream);
+    font-family:'Be Vietnam Pro', sans-serif;
+    font-weight:600;
+    font-size:0.92rem;
+    text-transform:uppercase;
+    cursor:pointer;
+    padding:0 8px;
+    transition:background .12s, transform .08s;
+  }
+  .key:hover{ background:#4a3a2c; }
+  .key:active{ transform:scale(0.94); }
+  .key.wide{ padding:0 14px; font-size:0.75rem; letter-spacing:0.03em; }
+  .key.tone{ background:var(--vermillion-deep); font-size:0.7rem; padding:0 10px; }
+  .key.tone:hover{ background:var(--vermillion); }
+  .key.status-green{ background:var(--green); color:#fff; }
+  .key.status-yellow{ background:var(--yellow); color:#241a14; }
+  .key.status-blue{ background:var(--blue); color:#fff; }
+  .key.status-gray{ background:var(--gray-dim); color:var(--cream-dim); opacity:0.55; }
+
+  #tone-hint{
+    font-size:0.75rem; color:var(--cream-dim); text-align:center; margin-bottom:8px;
+  }
+
+  /* Modal */
+  .modal-bg{
+    display:none; position:fixed; inset:0; background:rgba(10,7,5,0.7);
+    align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .modal-bg.show{ display:flex; }
+  .modal{
+    background:var(--lacquer-2);
+    border:1px solid rgba(201,162,75,0.3);
+    border-radius:12px;
+    padding:24px;
+    max-width:440px;
+    width:100%;
+    max-height:80vh;
+    overflow-y:auto;
+  }
+  .modal h2{ font-family:'Fraunces', serif; color:var(--gold); margin-top:0; }
+  .modal p, .modal li{ font-size:0.9rem; color:var(--cream-dim); line-height:1.55; }
+  .modal ul{ padding-left:18px; }
+  .modal .close-row{ text-align:right; margin-top:14px; }
+
+  footer{
+    margin-top:30px;
+    font-size:0.75rem;
+    color:var(--cream-dim);
+    text-align:center;
+    opacity:0.6;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow-row">
+      <h1>Đoán <em>Chữ</em> Vô Hạn</h1>
+      <button class="icon-btn" id="help-btn" title="Cách chơi" aria-label="Cách chơi">?</button>
+    </div>
+    <p class="tagline">Đoán cụm từ tiếng Việt gồm hai từ trong 6 lượt. Hết từ này lại có từ khác — chơi thoải mái, không giới hạn số lần.</p>
+  </header>
+
+  <div class="stats-strip">
+    <div class="stat"><span class="n" id="stat-played">0</span><span class="l">đã chơi</span></div>
+    <div class="stat"><span class="n" id="stat-won">0</span><span class="l">đoán đúng</span></div>
+    <div class="stat"><span class="n" id="stat-streak">0</span><span class="l">chuỗi thắng</span></div>
+  </div>
+
+  <div class="legend">
+    <span><i class="swatch" style="background:var(--green)"></i>Đúng chữ, đúng dấu, đúng vị trí</span>
+    <span><i class="swatch" style="background:var(--yellow)"></i>Đúng chữ, đúng dấu, sai vị trí</span>
+    <span><i class="swatch" style="background:var(--blue)"></i>Đúng nguyên âm gốc, sai dấu</span>
+    <span><i class="swatch" style="background:var(--gray-dim)"></i>Không có trong cụm từ</span>
+  </div>
+
+  <div id="msg"></div>
+  <div id="board-area"></div>
+
+  <div id="result-panel">
+    <p id="result-title"></p>
+    <p id="result-phrase"></p>
+    <div class="result-actions">
+      <button class="primary" id="next-word-btn">Từ tiếp theo</button>
+      <button class="ghost" id="copy-btn">Sao chép kết quả</button>
+    </div>
+  </div>
+
+  <div id="tone-hint">Gõ trực tiếp nếu máy có bàn phím tiếng Việt, hoặc: chọn chữ cái → chọn dấu để thêm thanh điệu.</div>
+  <div id="keyboard"></div>
+
+  <div style="text-align:center;margin-top:18px;">
+    <button class="ghost" id="skip-btn">Bỏ qua, đổi từ khác</button>
+  </div>
+
+  <footer>Lấy cảm hứng từ doanchu.vn — phiên bản chơi không giới hạn.</footer>
+</div>
+
+<div class="modal-bg" id="help-modal">
+  <div class="modal">
+    <h2>Cách chơi</h2>
+    <p>Đoán một cụm từ tiếng Việt gồm <b>hai từ</b> trong <b>6 lượt</b>. Mỗi ô là một chữ cái, kể cả dấu thanh. Khoảng cách giữa hai từ được giữ cố định trên bàn cờ — bạn không cần gõ dấu cách.</p>
+    <ul>
+      <li><b>Xanh lá</b>: đúng chữ cái và đúng dấu thanh, đúng vị trí.</li>
+      <li><b>Vàng</b>: đúng chữ cái và đúng dấu thanh, nhưng sai vị trí.</li>
+      <li><b>Xanh dương</b>: đúng nguyên âm gốc (ví dụ a, ă, â là ba nguyên âm khác nhau) nhưng sai dấu thanh — không đảm bảo đúng vị trí.</li>
+      <li><b>Xám</b>: chữ cái không xuất hiện trong cụm từ.</li>
+    </ul>
+    <p>Không có bàn phím tiếng Việt? Bấm chữ cái gốc trên bàn phím ảo rồi bấm một trong các nút <i>Sắc / Huyền / Hỏi / Ngã / Nặng</i> để thêm dấu vào chữ cái vừa gõ.</p>
+    <p>Đây là bản chơi <b>không giới hạn</b>: đoán xong một cụm từ, bấm "Từ tiếp theo" để chơi ván mới ngay lập tức.</p>
+    <div class="close-row"><button class="primary" id="close-help">Đã hiểu</button></div>
+  </div>
+</div>
+
+<script>
+/* ---------- Vietnamese vowel / tone data ---------- */
+const VOWEL_TONE = {
+  'a':['a','á','à','ả','ã','ạ'],
+  'ă':['ă','ắ','ằ','ẳ','ẵ','ặ'],
+  'â':['â','ấ','ầ','ẩ','ẫ','ậ'],
+  'e':['e','é','è','ẻ','ẽ','ẹ'],
+  'ê':['ê','ế','ề','ể','ễ','ệ'],
+  'i':['i','í','ì','ỉ','ĩ','ị'],
+  'o':['o','ó','ò','ỏ','õ','ọ'],
+  'ô':['ô','ố','ồ','ổ','ỗ','ộ'],
+  'ơ':['ơ','ớ','ờ','ở','ỡ','ợ'],
+  'u':['u','ú','ù','ủ','ũ','ụ'],
+  'ư':['ư','ứ','ừ','ử','ữ','ự'],
+  'y':['y','ý','ỳ','ỷ','ỹ','ỵ'],
+};
+const CHAR_TO_BASE = {};
+Object.keys(VOWEL_TONE).forEach(base=>{
+  VOWEL_TONE[base].forEach(ch=>{ CHAR_TO_BASE[ch]=base; });
+});
+const CONSONANTS = ['b','c','d','đ','g','h','k','l','m','n','p','q','r','s','t','v','x'];
+const TONE_LABELS = [
+  {key:'sac', idx:1, label:'Sắc'},
+  {key:'huyen', idx:2, label:'Huyền'},
+  {key:'hoi', idx:3, label:'Hỏi'},
+  {key:'nga', idx:4, label:'Ngã'},
+  {key:'nang', idx:5, label:'Nặng'},
+];
+function isVowel(ch){ return CHAR_TO_BASE.hasOwnProperty(ch); }
+
+/* ---------- Word bank: [tu1, tu2] ---------- */
+const WORD_BANK = [
+  ["gia","đình"],["bạn","bè"],["anh","em"],["cha","mẹ"],["ông","bà"],
+  ["con","cái"],["vợ","chồng"],["thầy","cô"],["học","sinh"],["sinh","viên"],
+  ["bác","sĩ"],["kỹ","sư"],["nông","dân"],["công","nhân"],["ca","sĩ"],
+  ["họa","sĩ"],["nhà","văn"],["nhà","thơ"],["diễn","viên"],["doanh","nhân"],
+  ["bầu","trời"],["mặt","trời"],["mặt","trăng"],["ngôi","sao"],["cơn","mưa"],
+  ["cầu","vồng"],["dòng","sông"],["ngọn","núi"],["khu","rừng"],["cánh","đồng"],
+  ["bãi","biển"],["hòn","đảo"],["con","suối"],["thác","nước"],["đại","dương"],
+  ["sa","mạc"],["đồng","cỏ"],["thung","lũng"],["hoa","hồng"],["cây","xanh"],
+  ["con","mèo"],["con","chó"],["con","gà"],["con","vịt"],["con","cá"],
+  ["con","chim"],["con","voi"],["con","hổ"],["con","gấu"],["con","khỉ"],
+  ["con","thỏ"],["con","rùa"],["con","ong"],["con","cua"],["con","tôm"],
+  ["bàn","ghế"],["cửa","sổ"],["cây","bút"],["chiếc","xe"],["con","dao"],
+  ["cái","ly"],["đôi","giày"],["chiếc","áo"],["cái","nón"],["bát","cơm"],
+  ["tô","phở"],["ổ","bánh"],["ly","trà"],["cốc","nước"],["quả","táo"],
+  ["quả","cam"],["quả","chuối"],["trái","dừa"],["hạt","gạo"],["cà","phê"],
+  ["hạnh","phúc"],["tình","yêu"],["nỗi","buồn"],["niềm","vui"],["ước","mơ"],
+  ["hy","vọng"],["tự","do"],["công","bằng"],["sự","thật"],["cuộc","sống"],
+  ["tương","lai"],["quá","khứ"],["hiện","tại"],["thời","gian"],["không","gian"],
+  ["tuổi","trẻ"],["kỷ","niệm"],["ký","ức"],["nụ","cười"],["ánh","sáng"],
+  ["đất","nước"],["quê","hương"],["thành","phố"],["nông","thôn"],["trường","học"],
+  ["bệnh","viện"],["công","viên"],["thư","viện"],["nhà","hàng"],["khách","sạn"],
+  ["sân","bay"],["bến","xe"],["con","đường"],["cây","cầu"],["căn","phòng"],
+  ["học","tập"],["làm","việc"],["nghỉ","ngơi"],["du","lịch"],["thể","thao"],
+  ["ca","hát"],["nhảy","múa"],["vẽ","tranh"],["nấu","ăn"],["đọc","sách"],
+  ["xem","phim"],["tập","luyện"],["nghiên","cứu"],["sáng","tạo"],["trò","chơi"],
+  ["âm","nhạc"],["hội","họa"],["văn","hóa"],["ngôn","ngữ"],["khoa","học"],
+  ["công","nghệ"],["kinh","tế"],["xã","hội"],["giáo","dục"],["y","tế"],
+  ["sức","khỏe"],["thời","tiết"],["khí","hậu"],["môi","trường"],["thiên","nhiên"],
+  ["mùa","xuân"],["mùa","hè"],["mùa","thu"],["mùa","đông"],["trái","tim"],
+  ["đôi","mắt"],["bàn","tay"],["mái","tóc"],["nụ","hôn"],["giấc","mơ"],
+  ["câu","chuyện"],["bài","hát"],["bộ","phim"],["món","ăn"],["bữa","cơm"],
+  ["ngôi","nhà"],["con","đò"],["cánh","diều"],["chiếc","thuyền"],["tàu","hỏa"],
+  ["máy","bay"],["xe","máy"],["xe","đạp"],["đèn","lồng"],["pháo","hoa"],
+];
+
+/* ---------- Game state ---------- */
+const MAX_TRIES = 6;
+let target = null;      // {chars:[...], split:int}
+let guesses = [];        // array of char-arrays (submitted)
+let feedbacks = [];      // array of result-arrays
+let current = [];        // chars being typed
+let gameOver = false;
+let recentIdx = -1;
+let stats = { played:0, won:0, streak:0 };
+let keyStatus = {};       // base/consonant -> 'green'|'yellow'|'blue'|'gray'
+
+const boardArea = document.getElementById('board-area');
+const msgEl = document.getElementById('msg');
+const resultPanel = document.getElementById('result-panel');
+const resultTitle = document.getElementById('result-title');
+const resultPhrase = document.getElementById('result-phrase');
+const keyboardEl = document.getElementById('keyboard');
+
+function pickWord(){
+  let idx;
+  do{ idx = Math.floor(Math.random()*WORD_BANK.length); }
+  while(WORD_BANK.length>1 && idx===recentIdx);
+  recentIdx = idx;
+  const [w1,w2] = WORD_BANK[idx];
+  const chars = (w1+w2).split('');
+  return { chars, split:w1.length, w1, w2 };
+}
+
+function startNewRound(){
+  target = pickWord();
+  guesses = [];
+  feedbacks = [];
+  current = [];
+  gameOver = false;
+  keyStatus = {};
+  resultPanel.classList.remove('show');
+  msgEl.textContent = '';
+  renderBoard();
+  renderKeyboard();
+}
+
+function flashMsg(text){
+  msgEl.textContent = text;
+  setTimeout(()=>{ if(msgEl.textContent===text) msgEl.textContent=''; }, 1600);
+}
+
+/* ---------- Evaluation ---------- */
+function evaluateGuess(guessArr, targetArr){
+  const n = targetArr.length;
+  const result = new Array(n).fill('gray');
+  const used = new Array(n).fill(false);
+  for(let i=0;i<n;i++){
+    if(guessArr[i]===targetArr[i]){ result[i]='green'; used[i]=true; }
+  }
+  for(let i=0;i<n;i++){
+    if(result[i]==='green') continue;
+    let found=-1;
+    for(let j=0;j<n;j++){
+      if(!used[j] && targetArr[j]===guessArr[i]){ found=j; break; }
+    }
+    if(found>=0){ result[i]='yellow'; used[found]=true; }
+  }
+  for(let i=0;i<n;i++){
+    if(result[i]==='gray' && isVowel(guessArr[i])){
+      const base = CHAR_TO_BASE[guessArr[i]];
+      const hasBase = targetArr.some(tc=> isVowel(tc) && CHAR_TO_BASE[tc]===base);
+      if(hasBase) result[i]='blue';
+    }
+  }
+  return result;
+}
+
+const STATUS_RANK = {gray:0, blue:1, yellow:2, green:3};
+function updateKeyStatus(guessArr, resultArr){
+  for(let i=0;i<guessArr.length;i++){
+    const ch = guessArr[i];
+    const key = isVowel(ch) ? CHAR_TO_BASE[ch] : ch;
+    const st = resultArr[i];
+    if(!keyStatus[key] || STATUS_RANK[st] > STATUS_RANK[keyStatus[key]]){
+      keyStatus[key] = st;
+    }
+  }
+}
+
+/* ---------- Rendering ---------- */
+function renderBoard(){
+  boardArea.innerHTML = '';
+  for(let r=0;r<MAX_TRIES;r++){
+    const row = document.createElement('div');
+    row.className = 'row';
+    const rowChars = r < guesses.length ? guesses[r]
+                    : r === guesses.length ? current
+                    : [];
+    const rowFeedback = r < feedbacks.length ? feedbacks[r] : null;
+    for(let c=0;c<target.chars.length;c++){
+      if(c === target.split){
+        const gap = document.createElement('div');
+        gap.className = 'gap-space';
+        row.appendChild(gap);
+      }
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      const ch = rowChars[c];
+      if(ch){ cell.textContent = ch; cell.classList.add('filled'); }
+      if(rowFeedback){ cell.classList.add(rowFeedback[c]); }
+      row.appendChild(cell);
+    }
+    boardArea.appendChild(row);
+  }
+}
+
+function renderKeyboard(){
+  keyboardEl.innerHTML = '';
+  const letterRows = [
+    ['a','ă','â','b','c','d','đ','e','ê','g'],
+    ['h','i','k','l','m','n','o','ô','ơ','p'],
+    ['q','r','s','t','u','ư','v','x','y'],
+  ];
+  letterRows.forEach(row=>{
+    const krow = document.createElement('div');
+    krow.className = 'krow';
+    row.forEach(ch=>{
+      const btn = document.createElement('button');
+      btn.className = 'key';
+      btn.textContent = ch;
+      const stKey = isVowel(ch) ? CHAR_TO_BASE[ch] : ch;
+      if(keyStatus[stKey]) btn.classList.add('status-'+keyStatus[stKey]);
+      btn.addEventListener('click', ()=> typeChar(ch));
+      krow.appendChild(btn);
+    });
+    keyboardEl.appendChild(krow);
+  });
+
+  const toneRow = document.createElement('div');
+  toneRow.className = 'krow';
+  TONE_LABELS.forEach(t=>{
+    const btn = document.createElement('button');
+    btn.className = 'key tone wide';
+    btn.textContent = t.label;
+    btn.addEventListener('click', ()=> applyTone(t.idx));
+    toneRow.appendChild(btn);
+  });
+  keyboardEl.appendChild(toneRow);
+
+  const ctrlRow = document.createElement('div');
+  ctrlRow.className = 'krow';
+  const back = document.createElement('button');
+  back.className = 'key wide';
+  back.textContent = 'Xóa';
+  back.addEventListener('click', backspace);
+  const enter = document.createElement('button');
+  enter.className = 'key wide';
+  enter.textContent = 'Enter';
+  enter.style.background = 'var(--vermillion)';
+  enter.addEventListener('click', submitGuess);
+  ctrlRow.appendChild(back);
+  ctrlRow.appendChild(enter);
+  keyboardEl.appendChild(ctrlRow);
+}
+
+/* ---------- Input handling ---------- */
+function typeChar(ch){
+  if(gameOver) return;
+  if(current.length >= target.chars.length) return;
+  current.push(ch);
+  renderBoard();
+}
+function applyTone(toneIdx){
+  if(gameOver) return;
+  if(current.length===0) return;
+  const last = current[current.length-1];
+  if(!isVowel(last)) return;
+  const base = CHAR_TO_BASE[last];
+  current[current.length-1] = VOWEL_TONE[base][toneIdx];
+  renderBoard();
+}
+function backspace(){
+  if(gameOver) return;
+  current.pop();
+  renderBoard();
+}
+function submitGuess(){
+  if(gameOver) return;
+  if(current.length < target.chars.length){
+    flashMsg('Chưa đủ chữ cái');
+    return;
+  }
+  const guessArr = current.slice();
+  const result = evaluateGuess(guessArr, target.chars);
+  guesses.push(guessArr);
+  feedbacks.push(result);
+  updateKeyStatus(guessArr, result);
+  current = [];
+  renderBoard();
+  renderKeyboard();
+
+  const won = result.every(r=>r==='green');
+  if(won){
+    endRound(true);
+  } else if(guesses.length >= MAX_TRIES){
+    endRound(false);
+  }
+}
+
+function endRound(won){
+  gameOver = true;
+  stats.played++;
+  if(won){ stats.won++; stats.streak++; }
+  else{ stats.streak = 0; }
+  updateStatsDisplay();
+
+  resultTitle.textContent = won ? 'Chính xác!' : 'Chưa đúng lần này';
+  resultPhrase.innerHTML = 'Cụm từ là: <b>'+target.w1+' '+target.w2+'</b>';
+  resultPanel.classList.add('show');
+}
+
+function updateStatsDisplay(){
+  document.getElementById('stat-played').textContent = stats.played;
+  document.getElementById('stat-won').textContent = stats.won;
+  document.getElementById('stat-streak').textContent = stats.streak;
+}
+
+function copyResult(){
+  const emoji = {green:'🟩', yellow:'🟨', blue:'🟦', gray:'⬛'};
+  let lines = ['Đoán Chữ Vô Hạn '+guesses.length+'/'+MAX_TRIES];
+  feedbacks.forEach(row=>{
+    let line = '';
+    row.forEach((st,i)=>{
+      if(i===target.split) line+=' ';
+      line += emoji[st];
+    });
+    lines.push(line);
+  });
+  const text = lines.join('\n');
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=> flashMsg('Đã sao chép kết quả!'))
+      .catch(()=> flashMsg('Không thể sao chép'));
+  }
+}
+
+/* ---------- Physical keyboard ---------- */
+const ALLOWED = new Set([...CONSONANTS, ...Object.keys(CHAR_TO_BASE)]);
+window.addEventListener('keydown', (e)=>{
+  if(document.getElementById('help-modal').classList.contains('show')) return;
+  if(e.key === 'Enter'){ submitGuess(); return; }
+  if(e.key === 'Backspace'){ backspace(); return; }
+  const k = e.key.toLowerCase();
+  if(k.length===1 && ALLOWED.has(k)){ typeChar(k); }
+});
+
+/* ---------- Buttons ---------- */
+document.getElementById('next-word-btn').addEventListener('click', startNewRound);
+document.getElementById('skip-btn').addEventListener('click', ()=>{
+  if(!gameOver && guesses.length===0 && current.length===0){
+    startNewRound();
+  } else if(!gameOver){
+    if(confirm('Bỏ ván hiện tại và chuyển sang từ khác?')) startNewRound();
+  } else {
+    startNewRound();
+  }
+});
+document.getElementById('copy-btn').addEventListener('click', copyResult);
+document.getElementById('help-btn').addEventListener('click', ()=> document.getElementById('help-modal').classList.add('show'));
+document.getElementById('close-help').addEventListener('click', ()=> document.getElementById('help-modal').classList.remove('show'));
+document.getElementById('help-modal').addEventListener('click', (e)=>{
+  if(e.target.id==='help-modal') e.target.classList.remove('show');
+});
+
+/* ---------- Init ---------- */
+startNewRound();
+updateStatsDisplay();
+</script>
+</body>
+</html>
