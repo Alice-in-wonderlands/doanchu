@@ -54,23 +54,17 @@
     letter-spacing:0.2px;
     color:var(--cream);
   }
-  h1 em{
-    font-style:italic;
-    color:var(--vermillion);
-  }
-  .tagline{
-    margin:8px 0 0;
-    color:var(--cream-dim);
-    font-size:0.95rem;
-    max-width:46ch;
-  }
+  h1 em{ font-style:italic; color:var(--vermillion); }
+  .tagline{ margin:8px 0 0; color:var(--cream-dim); font-size:0.95rem; max-width:46ch; }
+
+  .header-icons{ display:flex; gap:8px; flex:none; }
   .icon-btn{
     background:none;
     border:1px solid rgba(243,234,214,0.25);
     color:var(--cream);
     border-radius:999px;
     width:38px;height:38px;
-    font-size:1.05rem;
+    font-size:1.0rem;
     cursor:pointer;
     display:flex;align-items:center;justify-content:center;
     flex:none;
@@ -78,10 +72,27 @@
   }
   .icon-btn:hover{ border-color:var(--gold); background:rgba(201,162,75,0.08); }
 
+  .player-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    margin:14px 0 6px;
+    padding:10px 14px;
+    background:var(--panel);
+    border:1px solid rgba(243,234,214,0.08);
+    border-radius:10px;
+    font-size:0.85rem;
+  }
+  .player-bar .name{ color:var(--gold); font-weight:700; }
+  .player-bar button{
+    background:none; border:none; color:var(--cream-dim);
+    text-decoration:underline; cursor:pointer; font-size:0.78rem;
+    font-family:'Be Vietnam Pro', sans-serif;
+  }
+  .player-bar button:hover{ color:var(--gold); }
+
   .stats-strip{
     display:flex;
     gap:18px;
-    margin:16px 0 20px;
+    margin:10px 0 20px;
     padding:12px 16px;
     background:var(--panel);
     border:1px solid rgba(243,234,214,0.08);
@@ -116,38 +127,23 @@
     transition:transform .12s ease, background .25s, border-color .25s;
   }
   .cell.filled{ border-color:rgba(243,234,214,0.4); }
-  .cell.pop{ transform:scale(1.08); }
-  .cell.green{ background:var(--green); border-color:var(--green); color:#fff; }
+  .cell.green{ background:var(--green); border-color:var(--green); color:#0d1c0f; }
   .cell.yellow{ background:var(--yellow); border-color:var(--yellow); color:#241a14; }
   .cell.blue{ background:var(--blue); border-color:var(--blue); color:#fff; }
   .cell.gray{ background:var(--gray-dim); border-color:var(--gray-dim); color:var(--cream-dim); }
-  .cell.flip{ animation:flip .5s ease forwards; }
-  @keyframes flip{
-    0%{ transform:rotateX(0); }
-    50%{ transform:rotateX(90deg); }
-    100%{ transform:rotateX(0); }
-  }
   @media (max-width:400px){
     .cell{ width:34px; height:34px; font-size:1.05rem; }
     .gap-space{ width:10px; }
   }
 
-  #msg{
-    min-height:24px;
-    text-align:center;
-    font-size:0.88rem;
-    color:var(--gold);
-    margin-bottom:6px;
-  }
+  #msg{ min-height:24px; text-align:center; font-size:0.88rem; color:var(--gold); margin-bottom:6px; }
 
   #result-panel{
-    display:none;
-    text-align:center;
+    display:none; text-align:center;
     background:var(--panel);
     border:1px solid rgba(201,162,75,0.35);
     border-radius:10px;
-    padding:16px;
-    margin-bottom:18px;
+    padding:16px; margin-bottom:18px;
   }
   #result-panel.show{ display:block; }
   #result-title{ font-family:'Fraunces', serif; font-size:1.3rem; margin:0 0 4px; color:var(--gold); }
@@ -156,61 +152,41 @@
   .result-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
   button.primary{
-    background:var(--vermillion);
-    color:#fff;
-    border:none;
-    padding:10px 18px;
-    border-radius:8px;
-    font-weight:600;
-    font-size:0.9rem;
-    cursor:pointer;
-    font-family:'Be Vietnam Pro', sans-serif;
+    background:var(--vermillion); color:#fff; border:none;
+    padding:10px 18px; border-radius:8px; font-weight:600; font-size:0.9rem;
+    cursor:pointer; font-family:'Be Vietnam Pro', sans-serif;
     transition:background .15s, transform .1s;
   }
   button.primary:hover{ background:var(--vermillion-deep); }
   button.primary:active{ transform:scale(0.97); }
   button.ghost{
-    background:transparent;
-    color:var(--cream);
+    background:transparent; color:var(--cream);
     border:1px solid rgba(243,234,214,0.3);
-    padding:10px 18px;
-    border-radius:8px;
-    font-weight:600;
-    font-size:0.9rem;
-    cursor:pointer;
-    font-family:'Be Vietnam Pro', sans-serif;
+    padding:10px 18px; border-radius:8px; font-weight:600; font-size:0.9rem;
+    cursor:pointer; font-family:'Be Vietnam Pro', sans-serif;
   }
   button.ghost:hover{ border-color:var(--gold); color:var(--gold); }
 
   #keyboard{ display:flex; flex-direction:column; gap:6px; align-items:center; }
-  .krow{ display:flex; gap:5px; justify-content:center; flex-wrap:wrap; }
+  .krow{ display:flex; gap:5px; justify-content:center; }
   .key{
-    min-width:30px; height:42px;
-    border-radius:6px;
-    border:none;
-    background:#3a2c22;
-    color:var(--cream);
+    min-width:30px; height:44px; flex:1; max-width:38px;
+    border-radius:6px; border:none;
+    background:#3a2c22; color:var(--cream);
     font-family:'Be Vietnam Pro', sans-serif;
-    font-weight:600;
-    font-size:0.92rem;
-    text-transform:uppercase;
-    cursor:pointer;
-    padding:0 8px;
-    transition:background .12s, transform .08s;
+    font-weight:600; font-size:0.92rem; text-transform:uppercase;
+    cursor:pointer; padding:0; transition:background .12s, transform .08s;
   }
   .key:hover{ background:#4a3a2c; }
   .key:active{ transform:scale(0.94); }
-  .key.wide{ padding:0 14px; font-size:0.75rem; letter-spacing:0.03em; }
-  .key.tone{ background:var(--vermillion-deep); font-size:0.7rem; padding:0 10px; }
-  .key.tone:hover{ background:var(--vermillion); }
-  .key.status-green{ background:var(--green); color:#fff; }
+  .key.wide{ max-width:64px; flex:1.4; font-size:0.7rem; letter-spacing:0.02em; }
+  .key.status-green{ background:var(--green); color:#0d1c0f; }
   .key.status-yellow{ background:var(--yellow); color:#241a14; }
   .key.status-blue{ background:var(--blue); color:#fff; }
   .key.status-gray{ background:var(--gray-dim); color:var(--cream-dim); opacity:0.55; }
 
-  #tone-hint{
-    font-size:0.75rem; color:var(--cream-dim); text-align:center; margin-bottom:8px;
-  }
+  #tone-hint{ font-size:0.74rem; color:var(--cream-dim); text-align:center; margin-bottom:10px; line-height:1.5; }
+  #tone-hint b{ color:var(--gold); font-weight:600; }
 
   /* Modal */
   .modal-bg{
@@ -221,25 +197,41 @@
   .modal{
     background:var(--lacquer-2);
     border:1px solid rgba(201,162,75,0.3);
-    border-radius:12px;
-    padding:24px;
-    max-width:440px;
-    width:100%;
-    max-height:80vh;
-    overflow-y:auto;
+    border-radius:12px; padding:24px;
+    max-width:440px; width:100%; max-height:80vh; overflow-y:auto;
   }
   .modal h2{ font-family:'Fraunces', serif; color:var(--gold); margin-top:0; }
   .modal p, .modal li{ font-size:0.9rem; color:var(--cream-dim); line-height:1.55; }
   .modal ul{ padding-left:18px; }
   .modal .close-row{ text-align:right; margin-top:14px; }
-
-  footer{
-    margin-top:30px;
-    font-size:0.75rem;
-    color:var(--cream-dim);
-    text-align:center;
-    opacity:0.6;
+  .modal input[type=text]{
+    width:100%; padding:10px 12px; border-radius:8px;
+    border:1px solid rgba(243,234,214,0.25);
+    background:var(--lacquer); color:var(--cream);
+    font-family:'Be Vietnam Pro', sans-serif; font-size:0.95rem;
+    margin:10px 0;
   }
+  .modal .hint-note{ font-size:0.75rem; color:var(--cream-dim); opacity:0.8; }
+
+  table.rank-table{ width:100%; border-collapse:collapse; font-size:0.85rem; }
+  table.rank-table th{ text-align:left; color:var(--cream-dim); font-weight:600; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; padding:6px 4px; border-bottom:1px solid rgba(243,234,214,0.15); }
+  table.rank-table td{ padding:8px 4px; border-bottom:1px solid rgba(243,234,214,0.07); color:var(--cream); }
+  table.rank-table tr.me td{ color:var(--gold); font-weight:700; }
+  .rank-num{ color:var(--cream-dim); width:24px; }
+
+  .history-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid rgba(243,234,214,0.08);
+    font-size:0.85rem;
+  }
+  .history-item .hp{ color:var(--cream); }
+  .history-item .hp b{ color:var(--gold); }
+  .history-item .hr{ font-size:0.78rem; padding:3px 9px; border-radius:999px; font-weight:700; }
+  .history-item .hr.win{ background:rgba(21,207,77,0.18); color:var(--green); }
+  .history-item .hr.lose{ background:rgba(200,67,58,0.18); color:var(--vermillion); }
+  .empty-note{ color:var(--cream-dim); font-size:0.85rem; text-align:center; padding:16px 0; }
+
+  footer{ margin-top:30px; font-size:0.75rem; color:var(--cream-dim); text-align:center; opacity:0.6; }
 </style>
 </head>
 <body>
@@ -248,10 +240,19 @@
   <header>
     <div class="eyebrow-row">
       <h1>Đoán <em>Chữ</em> Vô Hạn</h1>
-      <button class="icon-btn" id="help-btn" title="Cách chơi" aria-label="Cách chơi">?</button>
+      <div class="header-icons">
+        <button class="icon-btn" id="rank-btn" title="Bảng xếp hạng" aria-label="Bảng xếp hạng">🏆</button>
+        <button class="icon-btn" id="history-btn" title="Lịch sử chơi" aria-label="Lịch sử chơi">🕘</button>
+        <button class="icon-btn" id="help-btn" title="Cách chơi" aria-label="Cách chơi">?</button>
+      </div>
     </div>
     <p class="tagline">Đoán cụm từ tiếng Việt gồm hai từ trong 6 lượt. Hết từ này lại có từ khác — chơi thoải mái, không giới hạn số lần.</p>
   </header>
+
+  <div class="player-bar">
+    <span>Đang chơi với tên: <span class="name" id="player-name-display">…</span></span>
+    <button id="rename-btn">Đổi tên</button>
+  </div>
 
   <div class="stats-strip">
     <div class="stat"><span class="n" id="stat-played">0</span><span class="l">đã chơi</span></div>
@@ -278,7 +279,7 @@
     </div>
   </div>
 
-  <div id="tone-hint">Gõ trực tiếp nếu máy có bàn phím tiếng Việt, hoặc: chọn chữ cái → chọn dấu để thêm thanh điệu.</div>
+  <div id="tone-hint">Gõ kiểu Telex (Unikey): <b>aa</b>→â <b>aw</b>→ă <b>ee</b>→ê <b>oo</b>→ô <b>ow</b>→ơ <b>uw</b>/<b>w</b>→ư <b>dd</b>→đ · thêm dấu bằng <b>s</b> sắc, <b>f</b> huyền, <b>r</b> hỏi, <b>x</b> ngã, <b>j</b> nặng · <b>z</b> xóa dấu</div>
   <div id="keyboard"></div>
 
   <div style="text-align:center;margin-top:18px;">
@@ -288,6 +289,7 @@
   <footer>Lấy cảm hứng từ doanchu.vn — phiên bản chơi không giới hạn.</footer>
 </div>
 
+<!-- Help modal -->
 <div class="modal-bg" id="help-modal">
   <div class="modal">
     <h2>Cách chơi</h2>
@@ -298,9 +300,39 @@
       <li><b>Xanh dương</b>: đúng nguyên âm gốc (ví dụ a, ă, â là ba nguyên âm khác nhau) nhưng sai dấu thanh — không đảm bảo đúng vị trí.</li>
       <li><b>Xám</b>: chữ cái không xuất hiện trong cụm từ.</li>
     </ul>
-    <p>Không có bàn phím tiếng Việt? Bấm chữ cái gốc trên bàn phím ảo rồi bấm một trong các nút <i>Sắc / Huyền / Hỏi / Ngã / Nặng</i> để thêm dấu vào chữ cái vừa gõ.</p>
-    <p>Đây là bản chơi <b>không giới hạn</b>: đoán xong một cụm từ, bấm "Từ tiếp theo" để chơi ván mới ngay lập tức.</p>
+    <p>Bàn phím dùng kiểu gõ Telex quen thuộc của Unikey: gõ <b>aa, aw, ee, oo, ow, uw, dd</b> để ra <b>â, ă, ê, ô, ơ, ư, đ</b>; gõ <b>s f r x j</b> ngay sau nguyên âm để thêm dấu <b>sắc huyền hỏi ngã nặng</b>; gõ <b>z</b> để xóa dấu vừa thêm.</p>
+    <p>Đây là bản chơi <b>không giới hạn</b>: đoán xong một cụm từ, bấm "Từ tiếp theo" để chơi ván mới ngay lập tức. Kết quả của bạn được ghi vào <b>lịch sử chơi</b> và <b>bảng xếp hạng</b> chung — tên và số liệu của bạn sẽ hiển thị công khai cho người chơi khác.</p>
     <div class="close-row"><button class="primary" id="close-help">Đã hiểu</button></div>
+  </div>
+</div>
+
+<!-- Rename modal -->
+<div class="modal-bg" id="rename-modal">
+  <div class="modal">
+    <h2>Đặt tên người chơi</h2>
+    <p>Tên này sẽ hiển thị trên bảng xếp hạng chung, cùng với số ván đã chơi, số lần đoán đúng và chuỗi thắng dài nhất của bạn — mọi người chơi khác đều thấy được.</p>
+    <input type="text" id="name-input" maxlength="20" placeholder="Nhập tên của bạn…">
+    <p class="hint-note">Tối đa 20 ký tự.</p>
+    <div class="close-row"><button class="primary" id="save-name-btn">Lưu tên</button></div>
+  </div>
+</div>
+
+<!-- Leaderboard modal -->
+<div class="modal-bg" id="rank-modal">
+  <div class="modal">
+    <h2>Bảng xếp hạng</h2>
+    <p class="hint-note">Xếp theo số lần đoán đúng, rồi đến chuỗi thắng dài nhất.</p>
+    <div id="rank-content"><p class="empty-note">Đang tải…</p></div>
+    <div class="close-row"><button class="ghost" id="close-rank">Đóng</button></div>
+  </div>
+</div>
+
+<!-- History modal -->
+<div class="modal-bg" id="history-modal">
+  <div class="modal">
+    <h2>Lịch sử chơi của bạn</h2>
+    <div id="history-content"><p class="empty-note">Đang tải…</p></div>
+    <div class="close-row"><button class="ghost" id="close-history">Đóng</button></div>
   </div>
 </div>
 
@@ -321,18 +353,14 @@ const VOWEL_TONE = {
   'y':['y','ý','ỳ','ỷ','ỹ','ỵ'],
 };
 const CHAR_TO_BASE = {};
+const TONE_INDEX = {};
 Object.keys(VOWEL_TONE).forEach(base=>{
-  VOWEL_TONE[base].forEach(ch=>{ CHAR_TO_BASE[ch]=base; });
+  VOWEL_TONE[base].forEach((ch,idx)=>{ CHAR_TO_BASE[ch]=base; TONE_INDEX[ch]=idx; });
 });
+const VOWEL_ROOT = {a:'a',ă:'a',â:'a', e:'e',ê:'e', i:'i', o:'o',ô:'o',ơ:'o', u:'u',ư:'u', y:'y'};
 const CONSONANTS = ['b','c','d','đ','g','h','k','l','m','n','p','q','r','s','t','v','x'];
-const TONE_LABELS = [
-  {key:'sac', idx:1, label:'Sắc'},
-  {key:'huyen', idx:2, label:'Huyền'},
-  {key:'hoi', idx:3, label:'Hỏi'},
-  {key:'nga', idx:4, label:'Ngã'},
-  {key:'nang', idx:5, label:'Nặng'},
-];
 function isVowel(ch){ return CHAR_TO_BASE.hasOwnProperty(ch); }
+function toneOf(base, idx){ return VOWEL_TONE[base][idx]; }
 
 /* ---------- Word bank: [tu1, tu2] ---------- */
 const WORD_BANK = [
@@ -373,14 +401,15 @@ const WORD_BANK = [
 
 /* ---------- Game state ---------- */
 const MAX_TRIES = 6;
-let target = null;      // {chars:[...], split:int}
-let guesses = [];        // array of char-arrays (submitted)
-let feedbacks = [];      // array of result-arrays
-let current = [];        // chars being typed
+let target = null;
+let guesses = [];
+let feedbacks = [];
+let current = [];
 let gameOver = false;
 let recentIdx = -1;
-let stats = { played:0, won:0, streak:0 };
-let keyStatus = {};       // base/consonant -> 'green'|'yellow'|'blue'|'gray'
+let stats = { played:0, won:0, streak:0, maxStreak:0 };
+let keyStatus = {};
+let playerName = null;
 
 const boardArea = document.getElementById('board-area');
 const msgEl = document.getElementById('msg');
@@ -444,10 +473,14 @@ function evaluateGuess(guessArr, targetArr){
 }
 
 const STATUS_RANK = {gray:0, blue:1, yellow:2, green:3};
+function rootOfChar(ch){
+  if(isVowel(ch)) return VOWEL_ROOT[CHAR_TO_BASE[ch]];
+  if(ch==='đ') return 'd';
+  return ch;
+}
 function updateKeyStatus(guessArr, resultArr){
   for(let i=0;i<guessArr.length;i++){
-    const ch = guessArr[i];
-    const key = isVowel(ch) ? CHAR_TO_BASE[ch] : ch;
+    const key = rootOfChar(guessArr[i]);
     const st = resultArr[i];
     if(!keyStatus[key] || STATUS_RANK[st] > STATUS_RANK[keyStatus[key]]){
       keyStatus[key] = st;
@@ -484,74 +517,123 @@ function renderBoard(){
 
 function renderKeyboard(){
   keyboardEl.innerHTML = '';
-  const letterRows = [
-    ['a','ă','â','b','c','d','đ','e','ê','g'],
-    ['h','i','k','l','m','n','o','ô','ơ','p'],
-    ['q','r','s','t','u','ư','v','x','y'],
+  const rows = [
+    ['q','w','e','r','t','y','u','i','o','p'],
+    ['a','s','d','f','g','h','j','k','l'],
+    ['enter','z','x','c','v','b','n','m','back'],
   ];
-  letterRows.forEach(row=>{
+  rows.forEach(row=>{
     const krow = document.createElement('div');
     krow.className = 'krow';
-    row.forEach(ch=>{
+    row.forEach(k=>{
       const btn = document.createElement('button');
       btn.className = 'key';
-      btn.textContent = ch;
-      const stKey = isVowel(ch) ? CHAR_TO_BASE[ch] : ch;
-      if(keyStatus[stKey]) btn.classList.add('status-'+keyStatus[stKey]);
-      btn.addEventListener('click', ()=> typeChar(ch));
+      if(k==='enter'){
+        btn.classList.add('wide');
+        btn.textContent = 'Enter';
+        btn.style.background = 'var(--vermillion)';
+        btn.addEventListener('click', submitGuess);
+      } else if(k==='back'){
+        btn.classList.add('wide');
+        btn.textContent = 'Xóa';
+        btn.addEventListener('click', backspace);
+      } else {
+        btn.textContent = k;
+        const rootKey = rootOfChar(k);
+        if(keyStatus[rootKey]) btn.classList.add('status-'+keyStatus[rootKey]);
+        btn.addEventListener('click', ()=> processKey(k));
+      }
       krow.appendChild(btn);
     });
     keyboardEl.appendChild(krow);
   });
-
-  const toneRow = document.createElement('div');
-  toneRow.className = 'krow';
-  TONE_LABELS.forEach(t=>{
-    const btn = document.createElement('button');
-    btn.className = 'key tone wide';
-    btn.textContent = t.label;
-    btn.addEventListener('click', ()=> applyTone(t.idx));
-    toneRow.appendChild(btn);
-  });
-  keyboardEl.appendChild(toneRow);
-
-  const ctrlRow = document.createElement('div');
-  ctrlRow.className = 'krow';
-  const back = document.createElement('button');
-  back.className = 'key wide';
-  back.textContent = 'Xóa';
-  back.addEventListener('click', backspace);
-  const enter = document.createElement('button');
-  enter.className = 'key wide';
-  enter.textContent = 'Enter';
-  enter.style.background = 'var(--vermillion)';
-  enter.addEventListener('click', submitGuess);
-  ctrlRow.appendChild(back);
-  ctrlRow.appendChild(enter);
-  keyboardEl.appendChild(ctrlRow);
 }
 
-/* ---------- Input handling ---------- */
-function typeChar(ch){
-  if(gameOver) return;
+/* ---------- Telex input handling ---------- */
+function prevCharSameWord(){
+  if(current.length===0) return null;
+  const prevIdx = current.length-1;
+  const curIdx = current.length;
+  const prevInWord1 = prevIdx < target.split;
+  const curInWord1 = curIdx < target.split;
+  if(prevInWord1 !== curInWord1) return null;
+  return current[prevIdx];
+}
+function insertLiteral(ch){
   if(current.length >= target.chars.length) return;
   current.push(ch);
   renderBoard();
 }
-function applyTone(toneIdx){
-  if(gameOver) return;
-  if(current.length===0) return;
-  const last = current[current.length-1];
-  if(!isVowel(last)) return;
-  const base = CHAR_TO_BASE[last];
-  current[current.length-1] = VOWEL_TONE[base][toneIdx];
+function replaceLast(ch){
+  current[current.length-1] = ch;
   renderBoard();
 }
+
+function processKey(key){
+  if(gameOver) return;
+  const prevChar = prevCharSameWord();
+
+  // đ via dd
+  if(key==='d'){
+    if(prevChar==='d'){ replaceLast('đ'); return; }
+    insertLiteral('d'); return;
+  }
+
+  // tone keys
+  if(['s','f','r','x','j'].includes(key)){
+    if(prevChar && isVowel(prevChar)){
+      const base = CHAR_TO_BASE[prevChar];
+      const toneIdx = {s:1,f:2,r:3,x:4,j:5}[key];
+      replaceLast(toneOf(base, toneIdx));
+      return;
+    }
+    if(['s','r','x'].includes(key)){ insertLiteral(key); }
+    return; // f, j alone aren't Vietnamese letters
+  }
+
+  // z = remove tone from last vowel
+  if(key==='z'){
+    if(prevChar && isVowel(prevChar)){
+      const base = CHAR_TO_BASE[prevChar];
+      replaceLast(toneOf(base, 0));
+    }
+    return;
+  }
+
+  // w = ă / ơ / ư depending on previous vowel, else standalone ư
+  if(key==='w'){
+    if(prevChar && isVowel(prevChar)){
+      const base = CHAR_TO_BASE[prevChar];
+      const toneIdx = TONE_INDEX[prevChar];
+      if(base==='a'){ replaceLast(toneOf('ă', toneIdx)); return; }
+      if(base==='o'){ replaceLast(toneOf('ơ', toneIdx)); return; }
+      if(base==='u'){ replaceLast(toneOf('ư', toneIdx)); return; }
+    }
+    insertLiteral('ư');
+    return;
+  }
+
+  // plain vowels: check doubling merges
+  if(['a','e','o'].includes(key) && prevChar && isVowel(prevChar)){
+    const base = CHAR_TO_BASE[prevChar];
+    const toneIdx = TONE_INDEX[prevChar];
+    if(key==='a' && base==='a'){ replaceLast(toneOf('â', toneIdx)); return; }
+    if(key==='e' && base==='e'){ replaceLast(toneOf('ê', toneIdx)); return; }
+    if(key==='o' && base==='o'){ replaceLast(toneOf('ô', toneIdx)); return; }
+  }
+
+  // remaining letters: plain vowels i,u,y and consonants
+  if(['a','e','i','o','u','y', ...CONSONANTS.filter(c=>c!=='đ')].includes(key)){
+    insertLiteral(key);
+  }
+}
+
 function backspace(){
   if(gameOver) return;
   current.pop();
   renderBoard();
 }
+
 function submitGuess(){
   if(gameOver) return;
   if(current.length < target.chars.length){
@@ -568,23 +650,22 @@ function submitGuess(){
   renderKeyboard();
 
   const won = result.every(r=>r==='green');
-  if(won){
-    endRound(true);
-  } else if(guesses.length >= MAX_TRIES){
-    endRound(false);
-  }
+  if(won){ endRound(true); }
+  else if(guesses.length >= MAX_TRIES){ endRound(false); }
 }
 
 function endRound(won){
   gameOver = true;
   stats.played++;
-  if(won){ stats.won++; stats.streak++; }
+  if(won){ stats.won++; stats.streak++; if(stats.streak>stats.maxStreak) stats.maxStreak=stats.streak; }
   else{ stats.streak = 0; }
   updateStatsDisplay();
 
   resultTitle.textContent = won ? 'Chính xác!' : 'Chưa đúng lần này';
   resultPhrase.innerHTML = 'Cụm từ là: <b>'+target.w1+' '+target.w2+'</b>';
   resultPanel.classList.add('show');
+
+  saveProgress(won);
 }
 
 function updateStatsDisplay(){
@@ -612,14 +693,142 @@ function copyResult(){
 }
 
 /* ---------- Physical keyboard ---------- */
-const ALLOWED = new Set([...CONSONANTS, ...Object.keys(CHAR_TO_BASE)]);
 window.addEventListener('keydown', (e)=>{
-  if(document.getElementById('help-modal').classList.contains('show')) return;
+  const anyModalOpen = document.querySelector('.modal-bg.show');
+  if(anyModalOpen) return;
   if(e.key === 'Enter'){ submitGuess(); return; }
   if(e.key === 'Backspace'){ backspace(); return; }
   const k = e.key.toLowerCase();
-  if(k.length===1 && ALLOWED.has(k)){ typeChar(k); }
+  if(k.length===1) processKey(k);
 });
+
+/* ---------- Persistence: player name, personal stats/history, leaderboard ---------- */
+function randomGuestName(){
+  return 'Khách'+Math.floor(1000+Math.random()*9000);
+}
+
+async function loadPlayer(){
+  try{
+    const res = await window.storage.get('player-name', false);
+    playerName = res ? res.value : null;
+  }catch(err){ playerName = null; }
+  if(!playerName){
+    playerName = randomGuestName();
+    try{ await window.storage.set('player-name', playerName, false); }catch(err){}
+  }
+  document.getElementById('player-name-display').textContent = playerName;
+
+  try{
+    const res = await window.storage.get('personal-stats', false);
+    if(res){
+      const parsed = JSON.parse(res.value);
+      stats = Object.assign(stats, parsed);
+    }
+  }catch(err){ /* no stats yet */ }
+  updateStatsDisplay();
+}
+
+async function saveProgress(won){
+  try{
+    await window.storage.set('personal-stats', JSON.stringify(stats), false);
+  }catch(err){ console.error('Lỗi lưu thống kê cá nhân', err); }
+
+  try{
+    let history = [];
+    try{
+      const res = await window.storage.get('history', false);
+      if(res) history = JSON.parse(res.value);
+    }catch(err){}
+    history.unshift({
+      date: new Date().toISOString(),
+      phrase: target.w1+' '+target.w2,
+      won: won,
+      tries: guesses.length,
+    });
+    if(history.length>50) history = history.slice(0,50);
+    await window.storage.set('history', JSON.stringify(history), false);
+  }catch(err){ console.error('Lỗi lưu lịch sử', err); }
+
+  try{
+    const key = 'leaderboard:'+playerName;
+    await window.storage.set(key, JSON.stringify({
+      name: playerName,
+      played: stats.played,
+      won: stats.won,
+      maxStreak: stats.maxStreak,
+      updatedAt: new Date().toISOString(),
+    }), true);
+  }catch(err){ console.error('Lỗi cập nhật bảng xếp hạng', err); }
+}
+
+async function renameFlow(newName){
+  const trimmed = newName.trim().slice(0,20);
+  if(!trimmed) return;
+  playerName = trimmed;
+  document.getElementById('player-name-display').textContent = playerName;
+  try{ await window.storage.set('player-name', playerName, false); }catch(err){}
+  await saveProgress(stats.streak>0);
+}
+
+async function openLeaderboard(){
+  const content = document.getElementById('rank-content');
+  content.innerHTML = '<p class="empty-note">Đang tải…</p>';
+  document.getElementById('rank-modal').classList.add('show');
+  try{
+    const listRes = await window.storage.list('leaderboard:', true);
+    const keys = listRes && listRes.keys ? listRes.keys : [];
+    if(keys.length===0){
+      content.innerHTML = '<p class="empty-note">Chưa có ai trên bảng xếp hạng. Hãy là người đầu tiên!</p>';
+      return;
+    }
+    const entries = [];
+    for(const k of keys.slice(0,60)){
+      try{
+        const r = await window.storage.get(k, true);
+        if(r) entries.push(JSON.parse(r.value));
+      }catch(err){}
+    }
+    entries.sort((a,b)=> (b.won-a.won) || (b.maxStreak-a.maxStreak) || (a.played-b.played));
+    const top = entries.slice(0,20);
+    let html = '<table class="rank-table"><thead><tr><th>#</th><th>Người chơi</th><th>Đoán đúng</th><th>Đã chơi</th><th>Chuỗi cao nhất</th></tr></thead><tbody>';
+    top.forEach((e,i)=>{
+      const mine = e.name===playerName ? ' class="me"' : '';
+      html += '<tr'+mine+'><td class="rank-num">'+(i+1)+'</td><td>'+escapeHtml(e.name)+'</td><td>'+e.won+'</td><td>'+e.played+'</td><td>'+e.maxStreak+'</td></tr>';
+    });
+    html += '</tbody></table>';
+    content.innerHTML = html;
+  }catch(err){
+    content.innerHTML = '<p class="empty-note">Không tải được bảng xếp hạng lúc này.</p>';
+  }
+}
+
+async function openHistory(){
+  const content = document.getElementById('history-content');
+  content.innerHTML = '<p class="empty-note">Đang tải…</p>';
+  document.getElementById('history-modal').classList.add('show');
+  try{
+    const res = await window.storage.get('history', false);
+    const history = res ? JSON.parse(res.value) : [];
+    if(history.length===0){
+      content.innerHTML = '<p class="empty-note">Bạn chưa chơi ván nào. Bắt đầu đoán để xem lịch sử ở đây!</p>';
+      return;
+    }
+    let html = '';
+    history.forEach(h=>{
+      const d = new Date(h.date);
+      const dateStr = d.toLocaleDateString('vi-VN')+' '+d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      html += '<div class="history-item"><span class="hp"><b>'+escapeHtml(h.phrase)+'</b><br><span style="color:var(--cream-dim);font-size:0.75rem;">'+dateStr+'</span></span>'
+            + '<span class="hr '+(h.won?'win':'lose')+'">'+(h.won ? h.tries+'/6' : 'Chưa đúng')+'</span></div>';
+    });
+    content.innerHTML = html;
+  }catch(err){
+    content.innerHTML = '<p class="empty-note">Không tải được lịch sử lúc này.</p>';
+  }
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
 
 /* ---------- Buttons ---------- */
 document.getElementById('next-word-btn').addEventListener('click', startNewRound);
@@ -635,13 +844,31 @@ document.getElementById('skip-btn').addEventListener('click', ()=>{
 document.getElementById('copy-btn').addEventListener('click', copyResult);
 document.getElementById('help-btn').addEventListener('click', ()=> document.getElementById('help-modal').classList.add('show'));
 document.getElementById('close-help').addEventListener('click', ()=> document.getElementById('help-modal').classList.remove('show'));
-document.getElementById('help-modal').addEventListener('click', (e)=>{
-  if(e.target.id==='help-modal') e.target.classList.remove('show');
+
+document.getElementById('rename-btn').addEventListener('click', ()=>{
+  document.getElementById('name-input').value = playerName || '';
+  document.getElementById('rename-modal').classList.add('show');
+});
+document.getElementById('save-name-btn').addEventListener('click', async ()=>{
+  const val = document.getElementById('name-input').value;
+  await renameFlow(val);
+  document.getElementById('rename-modal').classList.remove('show');
+});
+
+document.getElementById('rank-btn').addEventListener('click', openLeaderboard);
+document.getElementById('close-rank').addEventListener('click', ()=> document.getElementById('rank-modal').classList.remove('show'));
+
+document.getElementById('history-btn').addEventListener('click', openHistory);
+document.getElementById('close-history').addEventListener('click', ()=> document.getElementById('history-modal').classList.remove('show'));
+
+document.querySelectorAll('.modal-bg').forEach(bg=>{
+  bg.addEventListener('click', (e)=>{ if(e.target===bg) bg.classList.remove('show'); });
 });
 
 /* ---------- Init ---------- */
 startNewRound();
 updateStatsDisplay();
+loadPlayer();
 </script>
 </body>
 </html>
