@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#1b1410">
 <title>Đoán Chữ Vô Hạn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --lacquer:#120b05;
+    --lacquer:#1b1410;
     --lacquer-2:#241a14;
     --panel:#2a1f18;
     --cream:#f3ead6;
@@ -26,8 +26,8 @@
     --gray:#4a3d33;
     --gray-dim:#372c24;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  *{box-sizing:border-box; touch-action:manipulation; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0; overscroll-behavior:none;}
   body{
     background:
       radial-gradient(circle at 15% 0%, rgba(200,67,58,0.10), transparent 45%),
@@ -279,7 +279,7 @@
     </div>
   </div>
 
-  <div id="tone-hint">Gõ kiểu Telex (Unikey): <b>aa</b>→â <b>aw</b>→ă <b>ee</b>→ê <b>oo</b>→ô <b>ow</b>→ơ <b>uw</b>/<b>w</b>→ư <b>dd</b>→đ · thêm dấu bằng <b>s</b> sắc, <b>f</b> huyền, <b>r</b> hỏi, <b>x</b> ngã, <b>j</b> nặng · <b>z</b> xóa dấu</div>
+  <div id="tone-hint">Gõ kiểu Telex (Unikey): <b>aa</b>→â <b>aw</b>→ă <b>ee</b>→ê <b>oo</b>→ô <b>ow</b>→ơ <b>uw</b>/<b>w</b>→ư <b>dd</b>→đ · thêm dấu bằng <b>s</b> sắc, <b>f</b> huyền, <b>r</b> hỏi, <b>x</b> ngã, <b>j</b> nặng · <b>z</b> xóa dấu · nếu chữ tiếp theo vô tình bị ghép nhầm, bấm <b>space</b> để tách trước khi gõ tiếp</div>
   <div id="keyboard"></div>
 
   <div style="text-align:center;margin-top:18px;">
@@ -300,7 +300,7 @@
       <li><b>Xanh dương</b>: đúng nguyên âm gốc (ví dụ a, ă, â là ba nguyên âm khác nhau) nhưng sai dấu thanh — không đảm bảo đúng vị trí.</li>
       <li><b>Xám</b>: chữ cái không xuất hiện trong cụm từ.</li>
     </ul>
-    <p>Bàn phím dùng kiểu gõ Telex quen thuộc của Unikey: gõ <b>aa, aw, ee, oo, ow, uw, dd</b> để ra <b>â, ă, ê, ô, ơ, ư, đ</b>; gõ <b>s f r x j</b> ngay sau nguyên âm để thêm dấu <b>sắc huyền hỏi ngã nặng</b>; gõ <b>z</b> để xóa dấu vừa thêm.</p>
+    <p>Bàn phím dùng kiểu gõ Telex quen thuộc của Unikey: gõ <b>aa, aw, ee, oo, ow, uw, dd</b> để ra <b>â, ă, ê, ô, ơ, ư, đ</b>; gõ <b>s f r x j</b> ngay sau nguyên âm để thêm dấu <b>sắc huyền hỏi ngã nặng</b>; gõ <b>z</b> để xóa dấu vừa thêm. Dấu luôn gắn vào chữ cái bạn vừa gõ gần nhất, kể cả khi đó là chữ cuối của từ thứ nhất. Nếu chữ tiếp theo bị ghép nhầm vào chữ trước (hiếm khi xảy ra ở ranh giới giữa hai từ), bấm phím <b>space</b> để tách rồi gõ tiếp bình thường.</p>
     <p>Đây là bản chơi <b>không giới hạn</b>: đoán xong một cụm từ, bấm "Từ tiếp theo" để chơi ván mới ngay lập tức. Kết quả của bạn được ghi vào <b>lịch sử chơi</b> và <b>bảng xếp hạng</b> chung — tên và số liệu của bạn sẽ hiển thị công khai cho người chơi khác.</p>
     <div class="close-row"><button class="primary" id="close-help">Đã hiểu</button></div>
   </div>
@@ -409,7 +409,8 @@ let gameOver = false;
 let recentIdx = -1;
 let stats = { played:0, won:0, streak:0, maxStreak:0 };
 let keyStatus = {};
-let playerName = null;
+let playerName = 'Khách'+Math.floor(1000+Math.random()*9000);
+let storageOk = (typeof window.storage !== 'undefined' && window.storage !== null);
 
 const boardArea = document.getElementById('board-area');
 const msgEl = document.getElementById('msg');
@@ -521,6 +522,7 @@ function renderKeyboard(){
     ['q','w','e','r','t','y','u','i','o','p'],
     ['a','s','d','f','g','h','j','k','l'],
     ['enter','z','x','c','v','b','n','m','back'],
+    ['space'],
   ];
   rows.forEach(row=>{
     const krow = document.createElement('div');
@@ -537,6 +539,12 @@ function renderKeyboard(){
         btn.classList.add('wide');
         btn.textContent = 'Xóa';
         btn.addEventListener('click', backspace);
+      } else if(k==='space'){
+        btn.classList.add('wide');
+        btn.style.maxWidth = '220px';
+        btn.style.flex = '1';
+        btn.textContent = '␣ Tách âm (space)';
+        btn.addEventListener('click', breakChain);
       } else {
         btn.textContent = k;
         const rootKey = rootOfChar(k);
@@ -550,14 +558,15 @@ function renderKeyboard(){
 }
 
 /* ---------- Telex input handling ---------- */
-function prevCharSameWord(){
+let chainBroken = false; // set by Space: next key won't merge/tone the previous cell
+function prevCharForCombo(){
   if(current.length===0) return null;
-  const prevIdx = current.length-1;
-  const curIdx = current.length;
-  const prevInWord1 = prevIdx < target.split;
-  const curInWord1 = curIdx < target.split;
-  if(prevInWord1 !== curInWord1) return null;
-  return current[prevIdx];
+  if(chainBroken){ chainBroken = false; return null; }
+  return current[current.length-1];
+}
+function breakChain(){
+  chainBroken = true;
+  flashMsg('Đã ngắt gõ liên — chữ tiếp theo sẽ tách riêng');
 }
 function insertLiteral(ch){
   if(current.length >= target.chars.length) return;
@@ -571,7 +580,7 @@ function replaceLast(ch){
 
 function processKey(key){
   if(gameOver) return;
-  const prevChar = prevCharSameWord();
+  const prevChar = prevCharForCombo();
 
   // đ via dd
   if(key==='d'){
@@ -698,6 +707,7 @@ window.addEventListener('keydown', (e)=>{
   if(anyModalOpen) return;
   if(e.key === 'Enter'){ submitGuess(); return; }
   if(e.key === 'Backspace'){ backspace(); return; }
+  if(e.key === ' '){ e.preventDefault(); breakChain(); return; }
   const k = e.key.toLowerCase();
   if(k.length===1) processKey(k);
 });
@@ -708,27 +718,34 @@ function randomGuestName(){
 }
 
 async function loadPlayer(){
+  document.getElementById('player-name-display').textContent = playerName;
+  if(!storageOk){
+    console.warn('window.storage không khả dụng trong môi trường này — bảng xếp hạng và lịch sử sẽ không hoạt động.');
+    return;
+  }
   try{
     const res = await window.storage.get('player-name', false);
-    playerName = res ? res.value : null;
-  }catch(err){ playerName = null; }
-  if(!playerName){
-    playerName = randomGuestName();
-    try{ await window.storage.set('player-name', playerName, false); }catch(err){}
+    if(res && res.value) playerName = res.value;
+    else{
+      await window.storage.set('player-name', playerName, false);
+    }
+  }catch(err){
+    try{ await window.storage.set('player-name', playerName, false); }catch(err2){}
   }
   document.getElementById('player-name-display').textContent = playerName;
 
   try{
     const res = await window.storage.get('personal-stats', false);
-    if(res){
+    if(res && res.value){
       const parsed = JSON.parse(res.value);
       stats = Object.assign(stats, parsed);
     }
-  }catch(err){ /* no stats yet */ }
+  }catch(err){ /* no stats yet, that's fine */ }
   updateStatsDisplay();
 }
 
 async function saveProgress(won){
+  if(!storageOk) return;
   try{
     await window.storage.set('personal-stats', JSON.stringify(stats), false);
   }catch(err){ console.error('Lỗi lưu thống kê cá nhân', err); }
@@ -766,6 +783,7 @@ async function renameFlow(newName){
   if(!trimmed) return;
   playerName = trimmed;
   document.getElementById('player-name-display').textContent = playerName;
+  if(!storageOk) return;
   try{ await window.storage.set('player-name', playerName, false); }catch(err){}
   await saveProgress(stats.streak>0);
 }
@@ -774,31 +792,39 @@ async function openLeaderboard(){
   const content = document.getElementById('rank-content');
   content.innerHTML = '<p class="empty-note">Đang tải…</p>';
   document.getElementById('rank-modal').classList.add('show');
+  if(!storageOk){
+    content.innerHTML = '<p class="empty-note">Bảng xếp hạng cần bộ nhớ lưu trữ của Claude, hiện không dùng được ở đây. Hãy thử mở trang này trực tiếp trong Claude.</p>';
+    return;
+  }
   try{
     const listRes = await window.storage.list('leaderboard:', true);
-    const keys = listRes && listRes.keys ? listRes.keys : [];
+    const keys = (listRes && Array.isArray(listRes.keys)) ? listRes.keys : [];
     if(keys.length===0){
-      content.innerHTML = '<p class="empty-note">Chưa có ai trên bảng xếp hạng. Hãy là người đầu tiên!</p>';
+      content.innerHTML = '<p class="empty-note">Chưa có ai trên bảng xếp hạng. Hãy là người đầu tiên hoàn thành một ván!</p>';
       return;
     }
     const entries = [];
     for(const k of keys.slice(0,60)){
       try{
         const r = await window.storage.get(k, true);
-        if(r) entries.push(JSON.parse(r.value));
-      }catch(err){}
+        if(r && r.value) entries.push(JSON.parse(r.value));
+      }catch(err){ /* skip unreadable entry */ }
+    }
+    if(entries.length===0){
+      content.innerHTML = '<p class="empty-note">Chưa có dữ liệu xếp hạng nào đọc được. Hãy chơi xong một ván rồi quay lại.</p>';
+      return;
     }
     entries.sort((a,b)=> (b.won-a.won) || (b.maxStreak-a.maxStreak) || (a.played-b.played));
     const top = entries.slice(0,20);
     let html = '<table class="rank-table"><thead><tr><th>#</th><th>Người chơi</th><th>Đoán đúng</th><th>Đã chơi</th><th>Chuỗi cao nhất</th></tr></thead><tbody>';
     top.forEach((e,i)=>{
       const mine = e.name===playerName ? ' class="me"' : '';
-      html += '<tr'+mine+'><td class="rank-num">'+(i+1)+'</td><td>'+escapeHtml(e.name)+'</td><td>'+e.won+'</td><td>'+e.played+'</td><td>'+e.maxStreak+'</td></tr>';
+      html += '<tr'+mine+'><td class="rank-num">'+(i+1)+'</td><td>'+escapeHtml(e.name||'?')+'</td><td>'+(e.won||0)+'</td><td>'+(e.played||0)+'</td><td>'+(e.maxStreak||0)+'</td></tr>';
     });
     html += '</tbody></table>';
     content.innerHTML = html;
   }catch(err){
-    content.innerHTML = '<p class="empty-note">Không tải được bảng xếp hạng lúc này.</p>';
+    content.innerHTML = '<p class="empty-note">Không tải được bảng xếp hạng: '+escapeHtml(err && err.message ? err.message : 'lỗi không xác định')+'</p>';
   }
 }
 
@@ -806,9 +832,16 @@ async function openHistory(){
   const content = document.getElementById('history-content');
   content.innerHTML = '<p class="empty-note">Đang tải…</p>';
   document.getElementById('history-modal').classList.add('show');
+  if(!storageOk){
+    content.innerHTML = '<p class="empty-note">Lịch sử cần bộ nhớ lưu trữ của Claude, hiện không dùng được ở đây. Hãy thử mở trang này trực tiếp trong Claude.</p>';
+    return;
+  }
   try{
-    const res = await window.storage.get('history', false);
-    const history = res ? JSON.parse(res.value) : [];
+    let history = [];
+    try{
+      const res = await window.storage.get('history', false);
+      if(res && res.value) history = JSON.parse(res.value);
+    }catch(err){ /* no history yet */ }
     if(history.length===0){
       content.innerHTML = '<p class="empty-note">Bạn chưa chơi ván nào. Bắt đầu đoán để xem lịch sử ở đây!</p>';
       return;
@@ -822,7 +855,7 @@ async function openHistory(){
     });
     content.innerHTML = html;
   }catch(err){
-    content.innerHTML = '<p class="empty-note">Không tải được lịch sử lúc này.</p>';
+    content.innerHTML = '<p class="empty-note">Không tải được lịch sử: '+escapeHtml(err && err.message ? err.message : 'lỗi không xác định')+'</p>';
   }
 }
 
