@@ -434,7 +434,7 @@ const WORD_BANK = [
   ["đôi","mắt"],["bàn","tay"],["mái","tóc"],["nụ","hôn"],["giấc","mơ"],
   ["câu","chuyện"],["bài","hát"],["bộ","phim"],["món","ăn"],["bữa","cơm"],
   ["ngôi","nhà"],["con","đò"],["cánh","diều"],["chiếc","thuyền"],["tàu","hỏa"],
-  ["máy","bay"],["xe","máy"],["xe","đạp"],["đèn","lồng"],["pháo","hoa"],
+  ["máy","bay"],["xe","máy"],["xe","đạp"],["đèn","lồng"],["pháo","hoa"],["tuệ","thiên"],["tường","vy"],["luân","gà"],
 ];
 
 /* ---------- Game state ---------- */
@@ -732,10 +732,10 @@ function triggerCelebration(){
 function showCelebrationBanner(){
   const fast = guesses.length<=2;
   const messages = fast ? [
-    ['🤯','Thần tốc!'], ['⚡','Nhanh như chớp!'], ['🏆','Xuất chúng!'],
+    ['🤯','Ghê vậy cha!'], ['⚡','Nhanh như chớp!'], ['🏆','Khó vậy cũng nghĩ được!'],
   ] : [
     ['🎉','Xuất sắc!'], ['🥳','Tuyệt vời!'], ['✨','Quá đỉnh!'],
-    ['🎊','Cừ khôi!'], ['🔥','Thần sầu!'], ['👏','Chuẩn không cần chỉnh!'],
+    ['🎊','Cừ khôi!'], ['🔥','Cháy vậy!'], ['👏','Chuẩn không cần chỉnh!'],
   ];
   const [emoji, text] = messages[Math.floor(Math.random()*messages.length)];
   const banner = document.createElement('div');
