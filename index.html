@@ -167,19 +167,21 @@
   }
   button.ghost:hover{ border-color:var(--gold); color:var(--gold); }
 
-  #keyboard{ display:flex; flex-direction:column; gap:6px; align-items:center; }
-  .krow{ display:flex; gap:5px; justify-content:center; }
+  #keyboard{ display:flex; flex-direction:column; gap:5px; align-items:center; }
+  .krow{ display:flex; gap:4px; justify-content:center; width:100%; max-width:480px; }
   .key{
-    min-width:30px; height:44px; flex:1; max-width:38px;
+    min-width:24px; height:38px; flex:1; max-width:34px;
     border-radius:6px; border:none;
     background:#3a2c22; color:var(--cream);
     font-family:'Be Vietnam Pro', sans-serif;
-    font-weight:600; font-size:0.92rem; text-transform:uppercase;
+    font-weight:600; font-size:0.82rem; text-transform:uppercase;
     cursor:pointer; padding:0; transition:background .12s, transform .08s;
+    white-space:nowrap; overflow:hidden;
   }
   .key:hover{ background:#4a3a2c; }
   .key:active{ transform:scale(0.94); }
-  .key.wide{ max-width:64px; flex:1.4; font-size:0.7rem; letter-spacing:0.02em; }
+  .key.wide{ max-width:52px; flex:1.5; font-size:1.05rem; letter-spacing:0; padding:0 2px; }
+  .key.space-key{ max-width:260px; flex:1; font-size:0.72rem; letter-spacing:0.02em; }
   .key.status-green{ background:var(--green); color:#0d1c0f; }
   .key.status-yellow{ background:var(--yellow); color:#241a14; }
   .key.status-blue{ background:var(--blue); color:#fff; }
@@ -336,6 +338,10 @@
   </div>
 </div>
 
+<!-- Firebase (chỉ thật sự dùng khi bạn điền FIREBASE_CONFIG trong script bên dưới) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
 <script>
 /* ---------- Vietnamese vowel / tone data ---------- */
 const VOWEL_TONE = {
@@ -410,7 +416,6 @@ let recentIdx = -1;
 let stats = { played:0, won:0, streak:0, maxStreak:0 };
 let keyStatus = {};
 let playerName = 'Khách'+Math.floor(1000+Math.random()*9000);
-let storageOk = (typeof window.storage !== 'undefined' && window.storage !== null);
 
 const boardArea = document.getElementById('board-area');
 const msgEl = document.getElementById('msg');
@@ -532,17 +537,17 @@ function renderKeyboard(){
       btn.className = 'key';
       if(k==='enter'){
         btn.classList.add('wide');
-        btn.textContent = 'Enter';
+        btn.textContent = '⏎';
+        btn.title = 'Enter';
         btn.style.background = 'var(--vermillion)';
         btn.addEventListener('click', submitGuess);
       } else if(k==='back'){
         btn.classList.add('wide');
-        btn.textContent = 'Xóa';
+        btn.textContent = '⌫';
+        btn.title = 'Xóa';
         btn.addEventListener('click', backspace);
       } else if(k==='space'){
-        btn.classList.add('wide');
-        btn.style.maxWidth = '220px';
-        btn.style.flex = '1';
+        btn.classList.add('space-key');
         btn.textContent = '␣ Tách âm (space)';
         btn.addEventListener('click', breakChain);
       } else {
@@ -712,114 +717,136 @@ window.addEventListener('keydown', (e)=>{
   if(k.length===1) processKey(k);
 });
 
-/* ---------- Persistence: player name, personal stats/history, leaderboard ---------- */
-function randomGuestName(){
-  return 'Khách'+Math.floor(1000+Math.random()*9000);
+/* ================================================================
+   BẢNG XẾP HẠNG DÙNG CHUNG CHO NHIỀU NGƯỜI CHƠI (tuỳ chọn, cần Firebase)
+   ================================================================
+   Trang này khi tự host (GitHub + Vercel...) không có bộ nhớ dùng
+   chung kiểu Claude, nên bảng xếp hạng cần một nơi lưu trên mạng mà
+   ai cũng đọc/ghi được. Cách làm miễn phí, không cần server riêng:
+
+   1. Vào https://console.firebase.google.com → Add project (đặt tên
+      tuỳ ý, có thể tắt Google Analytics cho nhanh).
+   2. Trong project: Build → Firestore Database → Create database →
+      chọn "Start in test mode" → chọn khu vực gần bạn → Enable.
+   3. Vào biểu tượng bánh răng → Project settings → cuộn xuống mục
+      "Your apps" → bấm biểu tượng </> để thêm Web app → đặt tên bất
+      kỳ → Firebase sẽ đưa ra đoạn "firebaseConfig" dạng:
+        { apiKey: "...", authDomain: "...", projectId: "...", ... }
+      Copy toàn bộ object đó, dán đè vào FIREBASE_CONFIG ngay dưới đây.
+   4. Vào Firestore Database → tab Rules, dán rule sau rồi Publish
+      (cho phép đọc/ghi công khai — phù hợp trò chơi nhỏ, KHÔNG dùng
+      cho dữ liệu nhạy cảm):
+
+        rules_version = '2';
+        service cloud.firestore {
+          match /databases/{database}/documents {
+            match /leaderboard/{docId} {
+              allow read, write: if true;
+            }
+          }
+        }
+
+   5. Push code lên GitHub, deploy qua Vercel như bình thường — xong!
+
+   Nếu bạn để nguyên FIREBASE_CONFIG mặc định (chưa điền apiKey thật),
+   bảng xếp hạng sẽ tự báo "chưa cấu hình" thay vì lỗi — còn thống kê
+   cá nhân và lịch sử chơi vẫn hoạt động bình thường vì chúng lưu
+   ngay trên trình duyệt (localStorage), không cần bước nào ở trên.
+   ================================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID",
+};
+let fbDb = null;
+if(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY" && typeof firebase !== 'undefined'){
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    fbDb = firebase.firestore();
+  }catch(err){ console.warn('Không khởi tạo được Firebase:', err); fbDb = null; }
 }
 
-async function loadPlayer(){
+/* ---------- Local (per-browser) persistence: tên, thống kê, lịch sử ---------- */
+const LS_NAME = 'dc_player_name';
+const LS_STATS = 'dc_personal_stats';
+const LS_HISTORY = 'dc_history';
+
+function loadPlayer(){
   document.getElementById('player-name-display').textContent = playerName;
-  if(!storageOk){
-    console.warn('window.storage không khả dụng trong môi trường này — bảng xếp hạng và lịch sử sẽ không hoạt động.');
-    return;
-  }
   try{
-    const res = await window.storage.get('player-name', false);
-    if(res && res.value) playerName = res.value;
-    else{
-      await window.storage.set('player-name', playerName, false);
-    }
-  }catch(err){
-    try{ await window.storage.set('player-name', playerName, false); }catch(err2){}
-  }
+    const savedName = localStorage.getItem(LS_NAME);
+    if(savedName) playerName = savedName;
+    else localStorage.setItem(LS_NAME, playerName);
+  }catch(err){ /* localStorage không dùng được (chế độ ẩn danh?) */ }
   document.getElementById('player-name-display').textContent = playerName;
 
   try{
-    const res = await window.storage.get('personal-stats', false);
-    if(res && res.value){
-      const parsed = JSON.parse(res.value);
-      stats = Object.assign(stats, parsed);
-    }
-  }catch(err){ /* no stats yet, that's fine */ }
+    const savedStats = localStorage.getItem(LS_STATS);
+    if(savedStats) stats = Object.assign(stats, JSON.parse(savedStats));
+  }catch(err){}
   updateStatsDisplay();
 }
 
-async function saveProgress(won){
-  if(!storageOk) return;
-  try{
-    await window.storage.set('personal-stats', JSON.stringify(stats), false);
-  }catch(err){ console.error('Lỗi lưu thống kê cá nhân', err); }
+function saveProgress(won){
+  try{ localStorage.setItem(LS_STATS, JSON.stringify(stats)); }
+  catch(err){ console.error('Lỗi lưu thống kê cá nhân', err); }
 
   try{
     let history = [];
-    try{
-      const res = await window.storage.get('history', false);
-      if(res) history = JSON.parse(res.value);
-    }catch(err){}
-    history.unshift({
-      date: new Date().toISOString(),
-      phrase: target.w1+' '+target.w2,
-      won: won,
-      tries: guesses.length,
-    });
+    try{ const raw = localStorage.getItem(LS_HISTORY); if(raw) history = JSON.parse(raw); }catch(err){}
+    history.unshift({ date:new Date().toISOString(), phrase:target.w1+' '+target.w2, won:won, tries:guesses.length });
     if(history.length>50) history = history.slice(0,50);
-    await window.storage.set('history', JSON.stringify(history), false);
+    localStorage.setItem(LS_HISTORY, JSON.stringify(history));
   }catch(err){ console.error('Lỗi lưu lịch sử', err); }
 
-  try{
-    const key = 'leaderboard:'+playerName;
-    await window.storage.set(key, JSON.stringify({
-      name: playerName,
-      played: stats.played,
-      won: stats.won,
-      maxStreak: stats.maxStreak,
-      updatedAt: new Date().toISOString(),
-    }), true);
-  }catch(err){ console.error('Lỗi cập nhật bảng xếp hạng', err); }
+  pushLeaderboard();
 }
 
-async function renameFlow(newName){
+function pushLeaderboard(){
+  if(!fbDb) return;
+  const safeId = encodeURIComponent(playerName).slice(0,120) || 'guest';
+  fbDb.collection('leaderboard').doc(safeId).set({
+    name: playerName,
+    played: stats.played,
+    won: stats.won,
+    maxStreak: stats.maxStreak,
+    updatedAt: new Date().toISOString(),
+  }).catch(err=> console.error('Lỗi cập nhật bảng xếp hạng', err));
+}
+
+function renameFlow(newName){
   const trimmed = newName.trim().slice(0,20);
   if(!trimmed) return;
   playerName = trimmed;
   document.getElementById('player-name-display').textContent = playerName;
-  if(!storageOk) return;
-  try{ await window.storage.set('player-name', playerName, false); }catch(err){}
-  await saveProgress(stats.streak>0);
+  try{ localStorage.setItem(LS_NAME, playerName); }catch(err){}
+  pushLeaderboard();
 }
 
 async function openLeaderboard(){
   const content = document.getElementById('rank-content');
   content.innerHTML = '<p class="empty-note">Đang tải…</p>';
   document.getElementById('rank-modal').classList.add('show');
-  if(!storageOk){
-    content.innerHTML = '<p class="empty-note">Bảng xếp hạng cần bộ nhớ lưu trữ của Claude, hiện không dùng được ở đây. Hãy thử mở trang này trực tiếp trong Claude.</p>';
+  if(!fbDb){
+    content.innerHTML = '<p class="empty-note">Bảng xếp hạng chung chưa được cấu hình cho bản tự host này. Mở file HTML và làm theo hướng dẫn Firebase ở đầu phần mã nguồn (tìm dòng "FIREBASE_CONFIG") để bật tính năng này miễn phí.</p>';
     return;
   }
   try{
-    const listRes = await window.storage.list('leaderboard:', true);
-    const keys = (listRes && Array.isArray(listRes.keys)) ? listRes.keys : [];
-    if(keys.length===0){
+    const snap = await fbDb.collection('leaderboard').orderBy('won','desc').limit(20).get();
+    if(snap.empty){
       content.innerHTML = '<p class="empty-note">Chưa có ai trên bảng xếp hạng. Hãy là người đầu tiên hoàn thành một ván!</p>';
       return;
     }
-    const entries = [];
-    for(const k of keys.slice(0,60)){
-      try{
-        const r = await window.storage.get(k, true);
-        if(r && r.value) entries.push(JSON.parse(r.value));
-      }catch(err){ /* skip unreadable entry */ }
-    }
-    if(entries.length===0){
-      content.innerHTML = '<p class="empty-note">Chưa có dữ liệu xếp hạng nào đọc được. Hãy chơi xong một ván rồi quay lại.</p>';
-      return;
-    }
-    entries.sort((a,b)=> (b.won-a.won) || (b.maxStreak-a.maxStreak) || (a.played-b.played));
-    const top = entries.slice(0,20);
     let html = '<table class="rank-table"><thead><tr><th>#</th><th>Người chơi</th><th>Đoán đúng</th><th>Đã chơi</th><th>Chuỗi cao nhất</th></tr></thead><tbody>';
-    top.forEach((e,i)=>{
+    let i=0;
+    snap.forEach(doc=>{
+      i++;
+      const e = doc.data();
       const mine = e.name===playerName ? ' class="me"' : '';
-      html += '<tr'+mine+'><td class="rank-num">'+(i+1)+'</td><td>'+escapeHtml(e.name||'?')+'</td><td>'+(e.won||0)+'</td><td>'+(e.played||0)+'</td><td>'+(e.maxStreak||0)+'</td></tr>';
+      html += '<tr'+mine+'><td class="rank-num">'+i+'</td><td>'+escapeHtml(e.name||'?')+'</td><td>'+(e.won||0)+'</td><td>'+(e.played||0)+'</td><td>'+(e.maxStreak||0)+'</td></tr>';
     });
     html += '</tbody></table>';
     content.innerHTML = html;
@@ -828,20 +855,12 @@ async function openLeaderboard(){
   }
 }
 
-async function openHistory(){
+function openHistory(){
   const content = document.getElementById('history-content');
-  content.innerHTML = '<p class="empty-note">Đang tải…</p>';
   document.getElementById('history-modal').classList.add('show');
-  if(!storageOk){
-    content.innerHTML = '<p class="empty-note">Lịch sử cần bộ nhớ lưu trữ của Claude, hiện không dùng được ở đây. Hãy thử mở trang này trực tiếp trong Claude.</p>';
-    return;
-  }
   try{
-    let history = [];
-    try{
-      const res = await window.storage.get('history', false);
-      if(res && res.value) history = JSON.parse(res.value);
-    }catch(err){ /* no history yet */ }
+    const raw = localStorage.getItem(LS_HISTORY);
+    const history = raw ? JSON.parse(raw) : [];
     if(history.length===0){
       content.innerHTML = '<p class="empty-note">Bạn chưa chơi ván nào. Bắt đầu đoán để xem lịch sử ở đây!</p>';
       return;
@@ -855,7 +874,7 @@ async function openHistory(){
     });
     content.innerHTML = html;
   }catch(err){
-    content.innerHTML = '<p class="empty-note">Không tải được lịch sử: '+escapeHtml(err && err.message ? err.message : 'lỗi không xác định')+'</p>';
+    content.innerHTML = '<p class="empty-note">Không đọc được lịch sử trên trình duyệt này.</p>';
   }
 }
 
