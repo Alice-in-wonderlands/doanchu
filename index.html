@@ -234,6 +234,36 @@
   .empty-note{ color:var(--cream-dim); font-size:0.85rem; text-align:center; padding:16px 0; }
 
   footer{ margin-top:30px; font-size:0.75rem; color:var(--cream-dim); text-align:center; opacity:0.6; }
+
+  /* Celebration effects */
+  #fx-canvas{ position:fixed; inset:0; pointer-events:none; z-index:250; }
+  .celebrate-banner{
+    position:fixed; top:36%; left:50%;
+    transform:translate(-50%,-50%) scale(0.6);
+    z-index:300; pointer-events:none; text-align:center;
+    opacity:0;
+    animation: cbIn .45s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  .celebrate-banner.out{ animation: cbOut .45s ease forwards; }
+  .celebrate-banner .cb-emoji{
+    display:block; font-size:4.2rem; line-height:1;
+    filter:drop-shadow(0 6px 14px rgba(0,0,0,0.45));
+  }
+  .celebrate-banner .cb-text{
+    display:block; margin-top:8px;
+    font-family:'Fraunces', serif; font-weight:600; font-size:1.9rem;
+    color:var(--gold);
+    text-shadow:0 2px 14px rgba(0,0,0,0.65);
+  }
+  @keyframes cbIn{
+    0%{ opacity:0; transform:translate(-50%,-50%) scale(0.4) rotate(-6deg); }
+    60%{ opacity:1; transform:translate(-50%,-50%) scale(1.12) rotate(2deg); }
+    100%{ opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0); }
+  }
+  @keyframes cbOut{
+    from{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+    to{ opacity:0; transform:translate(-50%,-50%) scale(1.2); }
+  }
 </style>
 </head>
 <body>
@@ -248,7 +278,9 @@
         <button class="icon-btn" id="help-btn" title="Cách chơi" aria-label="Cách chơi">?</button>
       </div>
     </div>
-    <p class="tagline">Đoán cụm từ tiếng Việt gồm hai từ trong 6 lượt. Hết từ này lại có từ khác — chơi thoải mái, không giới hạn số lần.</p>
+    <p class="tagline">🧠 Đoán cụm từ 2 từ trong 6 lượt! <br/>
+Hết từ này lại đến từ khác — chơi không giới hạn, đoán tới khi nào chịu thua thì thôi! 😎<br/>
+    Còn Luân thì là một con gà, Alice mãi đỉnh</p>
   </header>
 
   <div class="player-bar">
@@ -288,7 +320,7 @@
     <button class="ghost" id="skip-btn">Bỏ qua, đổi từ khác</button>
   </div>
 
-  <footer>Lấy cảm hứng từ doanchu.vn — phiên bản chơi không giới hạn.</footer>
+  <footer>Lấy cảm hứng từ doanchu.vn — còn Luân là một con gà.</footer>
 </div>
 
 <!-- Help modal -->
@@ -679,6 +711,7 @@ function endRound(won){
   resultPhrase.innerHTML = 'Cụm từ là: <b>'+target.w1+' '+target.w2+'</b>';
   resultPanel.classList.add('show');
 
+  if(won){ triggerCelebration(); }
   saveProgress(won);
 }
 
@@ -686,6 +719,142 @@ function updateStatsDisplay(){
   document.getElementById('stat-played').textContent = stats.played;
   document.getElementById('stat-won').textContent = stats.won;
   document.getElementById('stat-streak').textContent = stats.streak;
+}
+
+/* ---------- Celebration effects (random each win) ---------- */
+function triggerCelebration(){
+  showCelebrationBanner();
+  const effects = ['confetti','fireworks','sparkle'];
+  const chosen = effects[Math.floor(Math.random()*effects.length)];
+  runCanvasEffect(chosen);
+}
+
+function showCelebrationBanner(){
+  const fast = guesses.length<=2;
+  const messages = fast ? [
+    ['🤯','Thần tốc!'], ['⚡','Nhanh như chớp!'], ['🏆','Xuất chúng!'],
+  ] : [
+    ['🎉','Xuất sắc!'], ['🥳','Tuyệt vời!'], ['✨','Quá đỉnh!'],
+    ['🎊','Cừ khôi!'], ['🔥','Thần sầu!'], ['👏','Chuẩn không cần chỉnh!'],
+  ];
+  const [emoji, text] = messages[Math.floor(Math.random()*messages.length)];
+  const banner = document.createElement('div');
+  banner.className = 'celebrate-banner';
+  banner.innerHTML = '<span class="cb-emoji">'+emoji+'</span><span class="cb-text">'+text+'</span>';
+  document.body.appendChild(banner);
+  setTimeout(()=>{ banner.classList.add('out'); }, 1300);
+  setTimeout(()=>{ banner.remove(); }, 1800);
+}
+
+function runCanvasEffect(type){
+  const old = document.getElementById('fx-canvas');
+  if(old) old.remove();
+
+  const canvas = document.createElement('canvas');
+  canvas.id = 'fx-canvas';
+  document.body.appendChild(canvas);
+  const dpr = window.devicePixelRatio || 1;
+  const W = window.innerWidth, H = window.innerHeight;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const colors = ['#c8433a','#c9a24b','#15cf4d','#3f7f9e','#f3ead6','#e6d62c'];
+  let particles = [];
+  let bursts = [];
+  let frame = 0;
+  let nextBurstAt = 0;
+  const duration = type==='fireworks' ? 210 : (type==='sparkle' ? 140 : 190);
+
+  if(type==='confetti'){
+    for(let i=0;i<150;i++){
+      particles.push({
+        x: Math.random()*W,
+        y: -20 - Math.random()*H*0.6,
+        vx: (Math.random()-0.5)*2.2,
+        vy: 2+Math.random()*3,
+        size: 4+Math.random()*5,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        rot: Math.random()*Math.PI*2,
+        vrot: (Math.random()-0.5)*0.3,
+        shape: Math.random()<0.5 ? 'rect' : 'circle',
+      });
+    }
+  } else if(type==='sparkle'){
+    for(let i=0;i<90;i++){
+      particles.push({
+        x: Math.random()*W,
+        y: Math.random()*H,
+        size: 1+Math.random()*3,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        phase: Math.random()*Math.PI*2,
+        speed: 0.06+Math.random()*0.12,
+      });
+    }
+  }
+
+  function spawnBurst(x,y){
+    const count = 44;
+    for(let i=0;i<count;i++){
+      const angle = (Math.PI*2*i)/count + Math.random()*0.2;
+      const speed = 2+Math.random()*3.2;
+      bursts.push({
+        x,y,
+        vx: Math.cos(angle)*speed,
+        vy: Math.sin(angle)*speed,
+        life: 55+Math.random()*20,
+        age: 0,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        size: 2+Math.random()*2,
+      });
+    }
+  }
+
+  function tick(){
+    frame++;
+    ctx.clearRect(0,0,W,H);
+
+    if(type==='confetti'){
+      particles.forEach(p=>{
+        p.x += p.vx; p.y += p.vy; p.rot += p.vrot; p.vy += 0.02;
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        if(p.shape==='rect') ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*1.6);
+        else{ ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2); ctx.fill(); }
+        ctx.restore();
+      });
+    } else if(type==='fireworks'){
+      if(frame>=nextBurstAt && frame<duration-40){
+        spawnBurst(W*(0.18+Math.random()*0.64), H*(0.18+Math.random()*0.4));
+        nextBurstAt = frame + 18 + Math.random()*24;
+      }
+      bursts.forEach(b=>{
+        b.age++; b.x+=b.vx; b.y+=b.vy; b.vy+=0.05; b.vx*=0.98; b.vy*=0.98;
+        const alpha = Math.max(0, 1-b.age/b.life);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = b.color;
+        ctx.beginPath(); ctx.arc(b.x,b.y,b.size,0,Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+      bursts = bursts.filter(b=> b.age<b.life);
+    } else if(type==='sparkle'){
+      particles.forEach(p=>{
+        p.phase += p.speed;
+        const alpha = (Math.sin(p.phase)+1)/2;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+    }
+
+    if(frame<duration){ requestAnimationFrame(tick); }
+    else{ canvas.remove(); }
+  }
+  tick();
 }
 
 function copyResult(){
