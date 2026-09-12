@@ -707,7 +707,7 @@ function endRound(won){
   else{ stats.streak = 0; }
   updateStatsDisplay();
 
-  resultTitle.textContent = won ? 'Chính xác!' : 'Chưa đúng lần này';
+  resultTitle.textContent = won ? 'Chính xác! Luân chính là 1 con gà!!' : 'Chưa đúng lần này vì Luân quá gà';
   resultPhrase.innerHTML = 'Cụm từ là: <b>'+target.w1+' '+target.w2+'</b>';
   resultPanel.classList.add('show');
 
